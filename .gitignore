@@ -21,3 +21,13 @@ dist-ssr
 *.sln
 *.sw?
 .env
+mobile/node_modules/
+mobile/.expo/
+mobile/.env
+mobile/android/build/
+mobile/android/app/build/
+mobile/android/.gradle/
+*.apk
+*.aab
+*.keystore
+*.jks
