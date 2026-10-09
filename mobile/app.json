@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "GadgetHub",
+    "slug": "gadgethub",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "gadgethub",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0f172a",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gadgethub.store"
+    },
+    "android": {
+      "package": "com.gadgethub.store",
+      "adaptiveIcon": {
+        "backgroundColor": "#0f172a"
+      },
+      "permissions": [
+        "INTERNET",
+        "READ_EXTERNAL_STORAGE",
+        "VIBRATE"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": ""
+      }
+    }
+  }
+}
