@@ -1,0 +1,18 @@
+{
+  "default_branch": "main",
+  "branches": [
+    "add-mobile",
+    "main",
+    "origin"
+  ],
+  "parent": {
+    "add-mobile": "main",
+    "main": null,
+    "origin": "main"
+  },
+  "order": [
+    "main",
+    "add-mobile",
+    "origin"
+  ]
+}
