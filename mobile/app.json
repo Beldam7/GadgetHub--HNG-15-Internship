@@ -6,7 +6,6 @@
     "orientation": "portrait",
     "scheme": "gadgethub",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "splash": {
       "backgroundColor": "#0f172a",
       "resizeMode": "contain"
@@ -30,7 +29,9 @@
       "bundler": "metro",
       "output": "static"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router"
+    ],
     "experiments": {
       "typedRoutes": true
     },
@@ -39,7 +40,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": ""
+        "projectId": "40df2238-5a88-45f2-b383-6cc933576198"
       }
     }
   }
