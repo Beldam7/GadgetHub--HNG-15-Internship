@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/AuthContext";
 import type { CartItem, Product } from "@/types";
@@ -22,18 +22,25 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Lets us ignore results from an older, slower load
+  const loadCounter = useRef(0);
 
   const loadCart = useCallback(async (userId: string) => {
+    const myLoad = ++loadCounter.current;
     setLoading(true);
     try {
-      // Get or create cart
-      const { data: existingCart } = await supabase
-        .from("carts")
-        .select("id")
-        .eq("user_id", userId)
-        .maybeSingle();
+      // Find the user's oldest cart (safe even if duplicates exist)
+      const findCart = async (): Promise<string | undefined> => {
+        const { data } = await supabase
+          .from("carts")
+          .select("id")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: true })
+          .limit(1);
+        return data?.[0]?.id as string | undefined;
+      };
 
-      let cId = existingCart?.id;
+      let cId = await findCart();
 
       if (!cId) {
         const { data: newCart, error } = await supabase
@@ -42,13 +49,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
           .select("id")
           .single();
         if (error) {
-          console.error("Cart creation error:", error);
-          setLoading(false);
-          return;
+          // Another request may have created it a moment ago
+          cId = await findCart();
+          if (!cId) {
+            console.error("Cart creation error:", error);
+            return;
+          }
+        } else {
+          cId = newCart.id;
         }
-        cId = newCart.id;
       }
 
+      if (myLoad !== loadCounter.current) return;
       setCartId(cId);
 
       // Load cart items with product details
@@ -65,23 +77,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
         console.error("Cart items load error:", error);
       }
 
+      if (myLoad !== loadCounter.current) return;
       setItems((cartItems as CartItem[]) || []);
     } catch (err) {
       console.error("Load cart error:", err);
     } finally {
-      setLoading(false);
+      if (myLoad === loadCounter.current) setLoading(false);
     }
   }, []);
 
+  const userId = user?.id ?? null;
+
   useEffect(() => {
-    if (user) {
-      loadCart(user.id);
+    if (userId) {
+      loadCart(userId);
     } else {
+      loadCounter.current++;
       setItems([]);
       setCartId(null);
       setLoading(false);
     }
-  }, [user, loadCart]);
+  }, [userId, loadCart]);
 
   const addToCart = useCallback(
     async (product: Product, quantity = 1): Promise<{ error: string | null }> => {
